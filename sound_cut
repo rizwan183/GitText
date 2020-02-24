@@ -1,0 +1,110 @@
+from scipy.io import wavfile
+from matplotlib import pyplot as plt
+import numpy as np
+import scipy.io.wavfile
+import scipy.signal
+from IPython.display import Audio
+from playsound import playsound
+from pydub import AudioSegment
+import speech_recognition as sr
+import ffmpeg
+
+# Load the data and calculate the time of each sample
+samplerate, data = wavfile.read('Dus.wav')
+times = np.arange(len(data))/float(samplerate)
+
+print(type(data))
+
+# Make the plot
+# You can tweak the figsize (width, height) in inches
+plt.figure(figsize=(30, 4))
+plt.fill_between(times, data[:,0], data[:,1], color='k')
+plt.xlim(times[0], times[-1])
+plt.xlabel('time (s)')
+plt.ylabel('amplitude')
+# You can set the format by changing the extension
+# like .pdf, .svg, .eps
+#plt.savefig('plot.png', dpi=100)
+plt.show()
+
+
+
+fs, wave = scipy.io.wavfile.read('Dus.wav')
+#Note that this particular file has a single channel. Most audio files will have two (stereo) channels.
+
+
+print ('Sampling rate:', fs)
+print ('Audio length:', wave.size/fs, 'seconds')
+
+
+max_min=[]
+mx=[]
+mn=[]
+index=0
+max1 = []
+
+
+cur=0
+pre=0
+last=0
+
+
+for index , i in enumerate(wave):
+    if index>0 and ((i[0]<0 and wave[index-1][0]>0) or i[0]==0):
+        mx.append(max1)
+        max1= []
+    max1.append(i[0])
+    max1.append(i[1])
+
+
+
+
+data=[]
+val1=[]
+k=1
+temp_data=[]
+for i in mx:
+    k=1
+    temp_data2=[]
+    temp_data3=[]
+    for j in i:
+        if k%2!=0:
+            temp_data3.append(j)
+        else:
+            temp_data3.append(j)
+            temp_data2.append(temp_data3)
+            temp_data3=[]
+        k=k+1
+    data.append(temp_data2)
+dur=0
+file_se_time=[]
+start_time=0
+end_time=0
+for d in data:
+    cur_dur=np.asarray(d).size/fs
+    dur=dur+(cur_dur)
+    end_time = end_time+cur_dur
+    if(cur_dur>=((wave.size/fs)/15000)):
+        file_se_time.append({"start":start_time,"end":end_time})
+        start_time=end_time
+fh = open("recognized.txt", "w+")
+flag = 0
+
+
+
+
+audio = AudioSegment.from_wav("Dus.wav")
+counter=1
+for time in file_se_time:
+    print(time)
+    start=float(time.get('start'))*1000
+    end=float(time.get('end'))*1000
+    chunk = audio[start:end]
+    filename = 'New_audio' + str(counter) + '.wav'
+    chunk.export(filename, format="wav")
+    print("Processing chunk " + str(counter) + ". Start = " + str(start) + " end = " + str(end))
+    counter = counter + 1
+
+
+
+'ffmpeg -i source.mp4 -ss 00:00:05 -t 00:00:10 -async 1 -strict -2 cut_video.mp4'
