@@ -1,0 +1,6 @@
+aws eks list-clusters
+aws eks --region us-east-1 update-kubeconfig --name "canopi-mng"
+kubectl logs -h
+aws sts get-caller-identity
+kubectl cluster-info dump
+kubectl cluster-info
