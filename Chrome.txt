@@ -1,0 +1,3 @@
+https://askubuntu.com/questions/68724/cannot-install-google-chrome
+
+https://understandingdata.com/install-google-chrome-selenium-ec2-aws
